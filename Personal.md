@@ -77,3 +77,25 @@ curl -LO https://github.com/argoproj/argo-rollouts/releases/latest/download/kube
 chmod +x ./kubectl-argo-rollouts-darwin-amd64
 sudo mv ./kubectl-argo-rollouts-darwin-amd64 /usr/local/bin/kubectl-argo-rollouts
 ```
+
+### Start new version of rollouts running
+
+```bash
+kubectl argo rollouts dashboard
+```
+
+## Traefik capabilities
+
+ArgoRollouts integrates Traefik in 2 ways:
+
+1. Using [TraefikService's native capabilities](https://doc.traefik.io/traefik/routing/providers/kubernetes-crd/#kind-traefikservice) to do [weighted round robin](https://doc.traefik.io/traefik/routing/providers/kubernetes-crd/#weighted-round-robin) and [trafficmirroring](https://doc.traefik.io/traefik/routing/providers/kubernetes-crd/#mirroring) : [Argo Rollouts Traffic Management - Traefik](https://argoproj.github.io/argo-rollouts/features/traffic-management/traefik/)
+
+- Note: this approach needs to not use `weight` if using ArgoCD since changes to the config made by Rollouts can make ArgoCD label the application as out of sync
+
+2. Using the [Rollouts-GatewayAPI-plugin](https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/tree/main/examples/traefik)
+
+- Traefik needs to be configured with
+
+```
+
+```
