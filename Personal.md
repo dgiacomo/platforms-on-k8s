@@ -96,6 +96,25 @@ ArgoRollouts integrates Traefik in 2 ways:
 
 - Traefik needs to be configured with
 
+# Prometheus, Grafana, and Keptn
+
+All these tools have been bundled together in `chapter-9/keptn` with a MakeFile. We need to let KLT know what namespace to monitor which can be done by annotating it
+To get at the lower level observability tools checkout: `chaper-9/keptn/support/observability/Makefile` : this file installs Jaeger, Prometheus, OtelCollector, and CertManager
+
+```bash
+make install
+kubectl annotate ns default keptn.sh/lifecycle-toolkit="enabled"
 ```
 
+## Portforwarding to installed observability tools
+
+```bash
+make port-forward-jaeger
+make port-forward-grafana
+make port-forward-prometheus
+
 ```
+
+Jaeger : [http://localhost:16686/](http://localhost:16686/)
+Grafana: [http://localhost:3000/](http://localhost:3000/) : admin/admin
+Prometheus: [http://localhost:9090/](http://localhost:9090/)
