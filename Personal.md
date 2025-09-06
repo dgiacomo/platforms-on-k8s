@@ -98,6 +98,7 @@ ArgoRollouts integrates Traefik in 2 ways:
 
 # Prometheus, Grafana, and Keptn
 
+Keptn provides Grafana dashboards and the ability to take actions based on metrics and events. You enable Keptn in a namespace and then it will look for annotated deployments to get metrics for the Keptn Apllications Grafana dashboard. Dashboards show deployment frequency, how long it took to deploy, versions.
 All these tools have been bundled together in `chapter-9/keptn` with a MakeFile. We need to let KLT know what namespace to monitor which can be done by annotating it
 To get at the lower level observability tools checkout: `chaper-9/keptn/support/observability/Makefile` : this file installs Jaeger, Prometheus, OtelCollector, and CertManager
 
@@ -109,12 +110,20 @@ kubectl annotate ns default keptn.sh/lifecycle-toolkit="enabled"
 ## Portforwarding to installed observability tools
 
 ```bash
+cd chapter-9/keptn
+# TOOLKIT_NAMESPACE ?= keptn-lifecycle-toolkit-system
+# kubectl port-forward -n "$(TOOLKIT_NAMESPACE)" svc/jaeger-query 16686
 make port-forward-jaeger
+
+# GRAFANA_PORT_FORWARD ?= 3000
+#  kubectl -n monitoring port-forward svc/grafana $(GRAFANA_PORT_FORWARD):3000
 make port-forward-grafana
+
+# kubectl -n monitoring port-forward svc/prometheus-k8s 9090
 make port-forward-prometheus
 
 ```
 
 Jaeger : [http://localhost:16686/](http://localhost:16686/)
-Grafana: [http://localhost:3000/](http://localhost:3000/) : admin/admin
+Grafana: [http://localhost:3000/](http://localhost:3000/)
 Prometheus: [http://localhost:9090/](http://localhost:9090/)
