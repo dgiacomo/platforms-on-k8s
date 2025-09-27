@@ -1,0 +1,68 @@
+{{- if .Values.install.ingress }}
+{{- $ingressProvider := .Values.ingress.provider | default "nginx" }}
+{{- $ingressClassName := "" }}
+{{- if eq $ingressProvider "traefik" }}
+{{- $ingressClassName = "traefik" }}
+{{- else if eq $ingressProvider "nginx" }}
+{{- $ingressClassName = "nginx" }}
+{{- end }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-admin-ingress 
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    {{- if eq $ingressProvider "nginx" }}
+    nginx.ingress.kubernetes.io/rewrite-target: {{ .Values.ingress.nginx.rewriteTarget | default "/" }}
+    {{- end }}
+    {{- if eq $ingressProvider "traefik" }}
+    {{- if .Values.ingress.traefik.middlewares }}
+    traefik.ingress.kubernetes.io/router.middlewares: {{ join "," .Values.ingress.traefik.middlewares }}
+    {{- end }}
+    {{- if .Values.ingress.traefik.entryPoints }}
+    traefik.ingress.kubernetes.io/router.entrypoints: {{ join "," .Values.ingress.traefik.entryPoints }}
+    {{- end }}
+    {{- end }}
+    {{- with .Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.ingress.className }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- else }}
+  ingressClassName: {{ $ingressClassName }}
+  {{- end }}
+  {{- if and .Values.ingress.tls.enabled .Values.ingress.tls.secretName }}
+  tls:
+  - hosts:
+    {{- if .Values.ingress.host }}
+    - {{ .Values.ingress.host }}
+    {{- else }}
+    - localhost
+    {{- end }}
+    secretName: {{ .Values.ingress.tls.secretName }}
+  {{- end }}
+  rules:
+  {{- if .Values.ingress.host }}
+  - host: {{ .Values.ingress.host }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: admin
+            port:
+              number: 80
+  {{- else }}
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: admin
+            port:
+              number: 80
+  {{- end }}
+{{- end }}

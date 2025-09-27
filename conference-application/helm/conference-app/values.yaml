@@ -12,6 +12,21 @@ services:
 install:
   infrastructure: true
   ingress: true
+ingress:
+  provider: nginx  # Options: nginx, traefik
+  className: nginx  # Will be set automatically based on provider
+  host: ""  # Optional: specify a host for the ingress
+  annotations: {}  # Additional annotations for specific use cases
+  tls:
+    enabled: false
+    secretName: ""  # TLS secret name if using HTTPS
+  traefik:
+    # Traefik-specific configuration
+    middlewares: []  # List of middleware names to apply
+    entryPoints: ["web"]  # Entry points for Traefik
+  nginx:
+    # Nginx-specific configuration  
+    rewriteTarget: "/"
 postgresql:
   image:
     debug: true
